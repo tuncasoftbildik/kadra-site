@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kadra — Elektrikli aracınızın panosu</title>
+<style>
+  :root { --bg:#0f1115; --fg:#e8eaed; --dim:#9aa0a6; --line:#2a2e35; --accent:#e8b44a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg);
+         font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  .wrap { max-width:720px; margin:0 auto; padding:48px 24px 80px; }
+  h1 { font-size:2rem; margin:0 0 4px; letter-spacing:-0.02em; }
+  .sub { color:var(--dim); margin:0 0 40px; }
+  h2 { font-size:1.15rem; margin:40px 0 12px; }
+  ul { padding-left:20px; }
+  li { margin:6px 0; }
+  a { color:var(--accent); }
+  .card { border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin:24px 0; }
+  footer { margin-top:56px; padding-top:24px; border-top:1px solid var(--line);
+           color:var(--dim); font-size:0.9rem; }
+  nav a { margin-right:18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Kadra</h1>
+  <p class="sub">Elektrikli aracınızın panosu — telefonunuzda, doğrudan Bluetooth ile.</p>
+
+  <p>Kadra, elektrikli aracınızın verilerini telefonunuzda canlı bir gösterge paneline dönüştürür.
+     Aracınıza doğrudan Bluetooth ile bağlanır: sunucu yok, hesap yok, kayıt yok.
+     Veriniz telefonunuzdan çıkmaz — çünkü gideceği bir yer yok.</p>
+
+  <h2>Neler gösterir</h2>
+  <ul>
+    <li>Anlık hız ve güç</li>
+    <li>Batarya yüzdesi ve kalan menzil</li>
+    <li>Şarj durumu, hızı ve tahmini bitiş süresi</li>
+    <li>İç sıcaklık ve iklimlendirme</li>
+    <li>Dört lastiğin ayrı ayrı basıncı</li>
+    <li>Aracın haritadaki konumu ve gittiği rota</li>
+  </ul>
+
+  <h2>Yalnızca okur</h2>
+  <p>Kadra araca komut gönderemez. Kapı açamaz, aracı süremez, ayar değiştiremez —
+     yalnızca aracın paylaştığı bilgileri okur. Bu bir tasarım tercihi değil,
+     kullandığı yetkinin sınırı.</p>
+
+  <div class="card">
+    <h2 style="margin-top:0">Destek</h2>
+    <p>Sorunuz, hata bildiriminiz veya öneriniz için yazın:</p>
+    <p><a href="mailto:tunca.bildik@gmail.com">tunca.bildik@gmail.com</a></p>
+    <p style="color:var(--dim);font-size:0.92rem;margin-bottom:0">
+      Yanıt genellikle birkaç iş günü içinde verilir.</p>
+  </div>
+
+  <h2>Sık sorulanlar</h2>
+  <p><strong>Aracımın bataryasını tüketir mi?</strong><br>
+     Uygulama arka plana geçtiğinde sorgular durur. Uyuyan araç, siz istemedikçe uyandırılmaz.</p>
+  <p><strong>Verilerim nereye gidiyor?</strong><br>
+     Hiçbir yere. Kadra'nın sunucusu yok. Tek ağ trafiği harita karolarıdır; haritayı
+     kapatırsanız uygulama sıfır ağ trafiğiyle çalışır.</p>
+  <p><strong>Nasıl kurulur?</strong><br>
+     Aracınızın VIN numarasını girin, anahtar kartınızı orta konsoldaki okuyucuya okutun.
+     Bir kez. Sonraki açılışlarda Kadra kendiliğinden bağlanır.</p>
+
+  <footer>
+    <nav>
+      <a href="./gizlilik.html">Gizlilik Politikası</a>
+      <a href="./kosullar.html">Kullanım Koşulları</a>
+    </nav>
+    <p>Kadra bağımsız bir uygulamadır. Tesla, Inc. ile bir ilişkisi yoktur, onun tarafından
+       desteklenmez veya onaylanmamıştır. Tesla, Tesla, Inc. şirketinin tescilli markasıdır.</p>
+    <p>© 2026 Tunca Bildik</p>
+  </footer>
+</div>
+</body>
+</html>
