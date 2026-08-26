@@ -4,75 +4,293 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kadra — Elektrikli aracınızın panosu</title>
+<meta name="description" content="Kadra, aracınızın verilerini telefonunuzda canlı bir gösterge paneline dönüştürür. Doğrudan Bluetooth — sunucu yok, hesap yok.">
+<link rel="icon" type="image/png" href="./img/favicon.png">
+<meta property="og:title" content="Kadra — Elektrikli aracınızın panosu">
+<meta property="og:description" content="Doğrudan Bluetooth ile bağlanan gösterge paneli. Sunucu yok, hesap yok.">
+<meta property="og:image" content="https://tuncasoftbildik.github.io/kadra-site/img/kokpit.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#0f1115; --fg:#e8eaed; --dim:#9aa0a6; --line:#2a2e35; --accent:#e8b44a; }
+  :root {
+    --ground:#0B0E13; --panel:#12161F; --line:#232A36;
+    --paper:#E9ECF1; --dim:#97A0AC;
+    --amber:#E8B44A; --green:#3BC46A; --red:#E0524D;
+    --display:"Chakra Petch",-apple-system,sans-serif;
+    --body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace;
+  }
   * { box-sizing:border-box; }
-  body { margin:0; background:var(--bg); color:var(--fg);
-         font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
-  .wrap { max-width:720px; margin:0 auto; padding:48px 24px 80px; }
-  h1 { font-size:2rem; margin:0 0 4px; letter-spacing:-0.02em; }
-  .sub { color:var(--dim); margin:0 0 40px; }
-  h2 { font-size:1.15rem; margin:40px 0 12px; }
-  ul { padding-left:20px; }
-  li { margin:6px 0; }
-  a { color:var(--accent); }
-  .card { border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin:24px 0; }
-  footer { margin-top:56px; padding-top:24px; border-top:1px solid var(--line);
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--ground); color:var(--paper);
+         font:16px/1.65 var(--body); -webkit-font-smoothing:antialiased; }
+  img { max-width:100%; display:block; }
+  a { color:var(--amber); }
+  .wrap { max-width:1060px; margin:0 auto; padding:0 22px; }
+
+  /* Üst şerit */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:20px 0; }
+  .brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--paper); }
+  .brand img { width:40px; height:40px; border-radius:10px; }
+  .brand span { font:600 1.25rem var(--display); letter-spacing:0.12em; }
+  .badge { font:500 0.72rem var(--mono); letter-spacing:0.08em; color:var(--amber);
+           border:1px solid var(--line); border-radius:999px; padding:7px 14px; white-space:nowrap; }
+
+  /* Hero */
+  .hero { position:relative; display:grid; gap:40px; padding:36px 0 56px; align-items:center; }
+  .hero h1 { font:700 clamp(2.1rem,6vw,3.4rem)/1.12 var(--display); margin:0 0 18px;
+             letter-spacing:-0.01em; }
+  .hero h1 em { font-style:normal; color:var(--amber); }
+  .hero p.lede { color:var(--dim); font-size:1.08rem; margin:0 0 26px; max-width:34em; }
+  .chips { display:flex; flex-wrap:wrap; gap:10px; }
+  .chip { font:500 0.78rem var(--mono); color:var(--paper); background:var(--panel);
+          border:1px solid var(--line); border-radius:999px; padding:8px 14px; }
+  .chip b { color:var(--green); font-weight:500; }
+
+  /* Güç yayı — imza */
+  .arc { position:absolute; left:-140px; top:-40px; width:520px; max-width:90vw;
+         pointer-events:none; opacity:0.5; z-index:0; }
+  .arc path.track { stroke:var(--line); }
+  .arc path.fill { stroke:url(#guc); stroke-dasharray:640; stroke-dashoffset:640;
+                   animation:dol 1.6s cubic-bezier(.3,.8,.3,1) 0.3s forwards; }
+  @keyframes dol { to { stroke-dashoffset:180; } }
+  @media (prefers-reduced-motion: reduce) {
+    .arc path.fill { animation:none; stroke-dashoffset:180; }
+  }
+  .hero-metin { position:relative; z-index:1; }
+
+  /* Telefon çerçevesi */
+  .phone { border:9px solid #1A202C; border-radius:46px; overflow:hidden;
+           background:#000; box-shadow:0 24px 60px rgba(0,0,0,0.55);
+           width:min(310px,78vw); margin:0 auto; }
+  .phone img { width:100%; }
+
+  /* Ölçüm şeridi */
+  .olcum { border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+           display:grid; gap:0; grid-template-columns:1fr; }
+  .olcum > div { padding:22px 8px; text-align:center; }
+  .olcum > div + div { border-top:1px solid var(--line); }
+  .olcum .n { font:700 1.9rem var(--display); color:var(--paper); }
+  .olcum .n small { font:500 1rem var(--display); color:var(--amber); }
+  .olcum .l { font:500 0.74rem var(--mono); letter-spacing:0.07em; color:var(--dim);
+              text-transform:uppercase; margin-top:4px; }
+
+  /* Bölümler */
+  section { padding:64px 0 8px; }
+  .eyebrow { font:500 0.74rem var(--mono); letter-spacing:0.14em; color:var(--amber);
+             text-transform:uppercase; margin:0 0 10px; }
+  h2 { font:600 clamp(1.5rem,3.6vw,2rem)/1.2 var(--display); margin:0 0 14px; }
+  .sec-metin p { color:var(--dim); max-width:36em; margin:0 0 14px; }
+  .sec-metin p strong { color:var(--paper); font-weight:600; }
+
+  .ozellik { display:grid; gap:36px; align-items:center; margin-bottom:26px; }
+
+  /* Geniş bant */
+  .bant { border:1px solid var(--line); border-radius:22px; overflow:hidden; margin-top:8px; }
+  .bant + .bant-not { font:500 0.78rem var(--mono); color:var(--dim); margin-top:12px; }
+
+  /* Kartlar */
+  .kartlar { display:grid; gap:18px; }
+  .kart { background:var(--panel); border:1px solid var(--line); border-radius:18px;
+          padding:24px 24px 18px; }
+  .kart h3 { font:600 1.05rem var(--display); margin:0 0 10px; }
+  .kart p { color:var(--dim); margin:0 0 10px; }
+  .kart p:last-child { margin-bottom:6px; }
+  .kart.vurgu { border-color:rgba(232,180,74,0.4); }
+
+  /* SSS */
+  .sss dt { font-weight:600; margin-top:20px; }
+  .sss dd { margin:6px 0 0; color:var(--dim); max-width:40em; }
+
+  footer { margin-top:72px; padding:28px 0 60px; border-top:1px solid var(--line);
            color:var(--dim); font-size:0.9rem; }
-  nav a { margin-right:18px; }
+  footer nav { margin-bottom:14px; }
+  footer nav a { margin-right:18px; }
+
+  a:focus-visible, .brand:focus-visible { outline:2px solid var(--amber); outline-offset:3px; border-radius:4px; }
+
+  @media (min-width:880px) {
+    .hero { grid-template-columns:1.15fr 0.85fr; padding-top:48px; }
+    .olcum { grid-template-columns:repeat(3,1fr); }
+    .olcum > div + div { border-top:0; border-left:1px solid var(--line); }
+    .ozellik { grid-template-columns:1fr 1fr; }
+    .ozellik.ters .sec-metin { order:2; }
+    .kartlar { grid-template-columns:1fr 1fr; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Kadra</h1>
-  <p class="sub">Elektrikli aracınızın panosu — telefonunuzda, doğrudan Bluetooth ile.</p>
 
-  <p>Kadra, elektrikli aracınızın verilerini telefonunuzda canlı bir gösterge paneline dönüştürür.
-     Aracınıza doğrudan Bluetooth ile bağlanır: sunucu yok, hesap yok, kayıt yok.
-     Veriniz telefonunuzdan çıkmaz — çünkü gideceği bir yer yok.</p>
+  <header class="topbar">
+    <a class="brand" href="./">
+      <img src="./img/ikon.png" alt="" width="40" height="40">
+      <span>KADRA</span>
+    </a>
+    <span class="badge">APP STORE — YAKINDA</span>
+  </header>
 
-  <h2>Neler gösterir</h2>
-  <ul>
-    <li>Anlık hız ve güç</li>
-    <li>Batarya yüzdesi ve kalan menzil</li>
-    <li>Şarj durumu, hızı ve tahmini bitiş süresi</li>
-    <li>İç sıcaklık ve iklimlendirme</li>
-    <li>Dört lastiğin ayrı ayrı basıncı</li>
-    <li>Aracın haritadaki konumu ve gittiği rota</li>
-  </ul>
+  <div class="hero">
+    <svg class="arc" viewBox="0 0 520 300" aria-hidden="true">
+      <defs>
+        <linearGradient id="guc" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="#3BC46A"/>
+          <stop offset="0.55" stop-color="#E8B44A"/>
+          <stop offset="1" stop-color="#E0524D"/>
+        </linearGradient>
+      </defs>
+      <path class="track" d="M40 280 A 220 220 0 0 1 480 280" fill="none" stroke-width="10" stroke-linecap="round"/>
+      <path class="fill"  d="M40 280 A 220 220 0 0 1 480 280" fill="none" stroke-width="10" stroke-linecap="round"/>
+    </svg>
 
-  <h2>Yalnızca okur</h2>
-  <p>Kadra araca komut gönderemez. Kapı açamaz, aracı süremez, ayar değiştiremez —
-     yalnızca aracın paylaştığı bilgileri okur. Bu bir tasarım tercihi değil,
-     kullandığı yetkinin sınırı.</p>
+    <div class="hero-metin">
+      <h1>Aracının panosu.<br><em>Telefonunda.</em></h1>
+      <p class="lede">Kadra, elektrikli aracının verilerini canlı bir gösterge paneline
+        dönüştürür. Aracına doğrudan Bluetooth ile bağlanır — arada internet,
+        bulut ya da başka biri yoktur.</p>
+      <div class="chips">
+        <span class="chip"><b>✓</b> Sunucu yok</span>
+        <span class="chip"><b>✓</b> Hesap yok</span>
+        <span class="chip"><b>✓</b> Kayıt yok</span>
+      </div>
+    </div>
 
-  <div class="card">
-    <h2 style="margin-top:0">Destek</h2>
-    <p>Sorunuz, hata bildiriminiz veya öneriniz için yazın:</p>
-    <p><a href="mailto:tunca.bildik@gmail.com">tunca.bildik@gmail.com</a></p>
-    <p style="color:var(--dim);font-size:0.92rem;margin-bottom:0">
-      Yanıt genellikle birkaç iş günü içinde verilir.</p>
+    <div class="phone"><img src="./img/kokpit.png"
+      alt="Kadra kokpit ekranı: hız kadranı, güç, batarya ve İstanbul haritası" ></div>
   </div>
 
-  <h2>Sık sorulanlar</h2>
-  <p><strong>Aracımın bataryasını tüketir mi?</strong><br>
-     Uygulama arka plana geçtiğinde sorgular durur. Uyuyan araç, siz istemedikçe uyandırılmaz.</p>
-  <p><strong>Verilerim nereye gidiyor?</strong><br>
-     Hiçbir yere. Kadra'nın sunucusu yok. Tek ağ trafiği harita karolarıdır; haritayı
-     kapatırsanız uygulama sıfır ağ trafiğiyle çalışır.</p>
-  <p><strong>Nasıl kurulur?</strong><br>
-     Aracınızın VIN numarasını girin, anahtar kartınızı orta konsoldaki okuyucuya okutun.
-     Bir kez. Sonraki açılışlarda Kadra kendiliğinden bağlanır.</p>
+  <div class="olcum" role="list">
+    <div role="listitem"><div class="n">4,8 <small>Hz</small></div>
+      <div class="l">saniyedeki canlı okuma</div></div>
+    <div role="listitem"><div class="n">211 <small>ms</small></div>
+      <div class="l">araçtan ekrana ortanca gecikme</div></div>
+    <div role="listitem"><div class="n">0</div>
+      <div class="l">sunucu · hesap · kayıt</div></div>
+  </div>
+
+  <section>
+    <div class="ozellik">
+      <div class="sec-metin">
+        <p class="eyebrow">Navigasyon</p>
+        <h2>Hedefi araçta seç, tarif telefonda başlasın</h2>
+        <p>Google destekli adım adım navigasyon: dönüş şeridi, sesli tarif ve trafiğe göre
+           rota. Aracında bir hedef seçtiğinde Kadra kendiliğinden yönlendirmeye geçer;
+           istersen uygulama içinden arayıp yol üstü şarj istasyonlarına tek dokunuşla
+           rota çizersin.</p>
+        <p><strong>Varışta pil tahmini</strong> rozeti, aracın kendi hedefine giderken
+           menzilinin yetip yetmeyeceğini yol boyunca söyler.</p>
+      </div>
+      <div class="phone"><img src="./img/nav.png" loading="lazy"
+        alt="Kadra navigasyon ekranı: dönüş şeridi ve rota çizgisi"></div>
+    </div>
+
+    <div class="ozellik ters">
+      <div class="sec-metin">
+        <p class="eyebrow">Kadran stilleri</p>
+        <h2>Kokpit senin — kadrana dokun, stili değiştir</h2>
+        <p>Klasik, Şerit, Gradyan ve Kapsül: dört kadran stili, koyu ya da açık tema.
+           Kadranı parmağınla sağa, sola veya ortaya taşı; ana ekran ve kilit ekranı
+           widget'larıyla pil ve menzil hep gözünün önünde.</p>
+      </div>
+      <div class="phone"><img src="./img/stil.png" loading="lazy"
+        alt="Kadran stili değiştirilmiş kokpit ekranı"></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Yatay kokpit</p>
+    <h2>Telefonu yatır, tutucuya koy</h2>
+    <div class="bant"><img src="./img/yatay.png" loading="lazy"
+      alt="Yatay kokpit: solda harita, ortada hız ve güç kadranları, sağda lastik kartı"></div>
+    <p class="bant-not">Yan panelde: seyir, lastik, araç ve EKO kartları — dokundukça değişir.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Neler gösterir</p>
+    <h2>Aracın ne paylaşıyorsa, olduğu gibi</h2>
+    <div class="kartlar">
+      <div class="kart">
+        <h3>Canlı kokpit</h3>
+        <p>Anlık hız ve güç, geri kazanım izi, batarya yüzdesi, kalan menzil,
+           vites, kilometre, iç–dış sıcaklık ve dört lastiğin ayrı ayrı basıncı
+           (bar veya psi).</p>
+      </div>
+      <div class="kart">
+        <h3>Şarjda kilit ekranında</h3>
+        <p>Araç şarja girince kilit ekranında canlı kart ve Dynamic Island'da yüzde:
+           şarj hızı, hedef sınır ve kalan süre — telefonu açmadan.</p>
+      </div>
+      <div class="kart">
+        <h3>Programlar ve EKO</h3>
+        <p>Şarj ve ön iklimlendirme programları ile anlık tüketim (Wh/km) ve sürüş
+           verimliliği skoru — ikisi de ücretsiz.</p>
+      </div>
+      <div class="kart vurgu">
+        <h3>Yalnızca okur</h3>
+        <p>Kadra araca komut gönderemez. Kapı açamaz, aracı süremez, ayar
+           değiştiremez — yalnızca aracın paylaştığı bilgileri okur. Bu bir tasarım
+           tercihi değil, kullandığı yetkinin sınırı.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Gizlilik</p>
+    <h2>Verin telefonunda kalır — çünkü gideceği bir yer yok</h2>
+    <div class="sec-metin">
+      <p>Kadra'nın sunucusu yok. Kayıt olmazsın, şifre girmezsin. Harita açıkken konumun
+         yalnız harita, rota ve navigasyon için Google'a iletilir; haritayı kapatırsan
+         uygulama <strong>sıfır ağ trafiğiyle</strong> çalışır. Denemesi kolay: haritayı
+         kapat, telefonu uçak moduna al — Kadra çalışmaya devam eder.</p>
+      <p>Uygulama arka plana geçtiğinde sorgular durur. Uyuyan araç, sen istemedikçe
+         uyandırılmaz.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Sık sorulanlar</p>
+    <h2>Kısa cevaplar</h2>
+    <dl class="sss">
+      <dt>Nasıl kurulur?</dt>
+      <dd>Aracının VIN numarasını gir, anahtar kartını orta konsoldaki okuyucuya okut.
+          Bir kez. Sonraki açılışlarda Kadra kendiliğinden bağlanır — görselli rehber
+          ilk açılışta yol gösterir.</dd>
+      <dt>Aracımın bataryasını tüketir mi?</dt>
+      <dd>Hayır. Uygulama arka plana geçince sorgular durur; boşta kalınca ritim kendini
+          duraklatır. Uyuyan araç uyandırılmaz.</dd>
+      <dt>Hangi özellikler ücretsiz?</dt>
+      <dd>Kokpitin tamamı: hız, güç, batarya, menzil, şarj, iklim, lastik basıncı,
+          programlar ve EKO skoru. Harita, navigasyon, araç takibi ve kadran stilleri
+          Kadra Pro aboneliğine bağlıdır — karar vermeden önce 5 saatlik ücretsiz
+          deneme ve ilk ay ücretsiz.</dd>
+      <dt>İnternet olmadan çalışır mı?</dt>
+      <dd>Evet. Araç bağlantısı tamamen Bluetooth üzerindendir; internet yalnız harita
+          ve navigasyon için gerekir.</dd>
+    </dl>
+  </section>
+
+  <section>
+    <div class="kart vurgu" id="destek">
+      <h3>Destek</h3>
+      <p>Sorun, hata bildirimin veya önerin için yaz:
+         <a href="mailto:tunca.bildik@gmail.com">tunca.bildik@gmail.com</a></p>
+      <p>Yanıt genellikle birkaç iş günü içinde verilir.</p>
+    </div>
+  </section>
 
   <footer>
     <nav>
       <a href="./gizlilik.html">Gizlilik Politikası</a>
       <a href="./kosullar.html">Kullanım Koşulları</a>
     </nav>
-    <p>Kadra bağımsız bir uygulamadır. Tesla, Inc. ile bir ilişkisi yoktur, onun tarafından
-       desteklenmez veya onaylanmamıştır. Tesla, Tesla, Inc. şirketinin tescilli markasıdır.</p>
+    <p>Ekran görüntüleri örnek veriyle alınmıştır. Kadra bağımsız bir uygulamadır;
+       Tesla, Inc. ile bir ilişkisi yoktur, onun tarafından desteklenmez veya
+       onaylanmamıştır. Tesla, Tesla, Inc. şirketinin tescilli markasıdır.
+       Google Haritalar, Google LLC'nin markasıdır.</p>
     <p>© 2026 Tunca Bildik</p>
   </footer>
+
 </div>
 </body>
 </html>
