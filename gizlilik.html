@@ -25,17 +25,24 @@
 <body>
 <div class="wrap">
   <h1>Gizlilik Politikası</h1>
-  <p class="sub">Kadra · Son güncelleme: 22 Ağustos 2026</p>
+  <p class="sub">Kadra · Son güncelleme: 31 Ağustos 2026</p>
 
   <div class="card">
-    <p style="margin:0"><strong>Özet:</strong> Kadra hiçbir veri toplamaz. Sunucusu yoktur.
-    Aracınızdan okunan hiçbir bilgi telefonunuzdan çıkmaz.</p>
+    <p style="margin:0"><strong>Özet:</strong> Kadra'nın sunucusu, hesabı ve kaydı yoktur;
+    aracınızdan okunan hiçbir bilgi telefonunuzdan çıkmaz. Tek istisna haritadır: harita
+    açıkken telefonunuzun konumu, haritayı çizmek ve rota hesaplamak için Google'a iletilir.
+    Haritayı kapatırsanız Kadra sıfır ağ trafiğiyle çalışır.</p>
   </div>
 
   <h2>Topladığımız veriler</h2>
-  <p>Hiçbiri. Kadra'nın sunucusu, veritabanı veya hesap sistemi yoktur. Kayıt olmanız,
-     e-posta veya şifre girmeniz gerekmez. Uygulama sizi tanımlayan hiçbir bilgi istemez
-     ve saklamaz.</p>
+  <p>Kadra <strong>kendi adına hiçbir veri toplamaz</strong>. Sunucusu, veritabanı veya
+     hesap sistemi yoktur. Kayıt olmanız, e-posta veya şifre girmeniz gerekmez. Uygulama
+     sizi tanımlayan hiçbir bilgi istemez, hiçbir yere göndermez.</p>
+  <p>Ancak harita ve navigasyon Google Navigation SDK ile çalışır ve <strong>Google kendi
+     adına veri toplar</strong>. App Store ürün sayfasındaki "Uygulama Gizliliği"
+     bölümünde beyan ettiğimiz veri türleri — konum, cihaz tanımlayıcısı, çökme ve
+     başarım verisi, ürün etkileşimi — bu SDK'dan kaynaklanır, Kadra'dan değil.
+     Aşağıdaki <a href="#google">Google Navigation SDK</a> bölümüne bakın.</p>
 
   <h2>Aracınızdan okunan bilgiler</h2>
   <p>Kadra, aracınıza doğrudan Bluetooth Low Energy ile bağlanır ve şu bilgileri okur:
@@ -48,23 +55,48 @@
      aracı süremez, hiçbir ayarı değiştiremez.</p>
 
   <h2>Konum</h2>
-  <p>Kadra telefonunuzun konumunu <strong>kullanmaz</strong> ve konum izni istemez.
-     Haritada gösterilen konum aracınızın kendi bildirdiği konumdur ve yalnızca ekrana
-     çizilir; hiçbir yere gönderilmez veya kaydedilmez.</p>
+  <p>Kadra iki ayrı konumla çalışır ve ikisi birbirinden farklıdır:</p>
+  <ul>
+    <li><strong>Aracınızın konumu</strong> — araçtan Bluetooth ile okunur, yalnızca ekrana
+        çizilir. Hiçbir yere gönderilmez, hiçbir dosyaya kaydedilmez.</li>
+    <li><strong>Telefonunuzun konumu</strong> — yalnızca <strong>harita açıkken</strong>
+        kullanılır. Haritayı sürmek, hedef aramak ve rota hesaplamak için Google'a iletilir.
+        Uygulama bu yüzden konum izni ister.</li>
+  </ul>
+  <p>Uygulama <strong>arka planda konum</strong> yetkisini yalnızca <strong>etkin
+     yönlendirme sürerken</strong> kullanır — yolculuk sırasında telefonu kilitleseniz ya
+     da başka bir uygulamaya geçseniz de sesli ve görsel tarifin devam edebilmesi için.
+     Yönlendirme yokken arka planda konum kullanılmaz.</p>
+  <p>Haritayı Ayarlar'dan kapatırsanız konum hiç kullanılmaz.</p>
 
   <h2>Ağ kullanımı</h2>
-  <p>Uygulamanın tek ağ trafiği harita karolarıdır ve bunlar Apple Haritalar'dan gelir.
-     Ayarlar bölümünden haritayı kapatırsanız Kadra sıfır ağ trafiğiyle çalışır.
-     Bunu telefonunuzu uçak moduna alarak doğrulayabilirsiniz.</p>
+  <p>Uygulamanın tek ağ trafiği haritadır: Google harita karoları, hedef arama ve
+     navigasyon. Başka hiçbir ağ isteği yapılmaz — araç verisi hiçbir yere gönderilmez.</p>
+  <p>Ayarlar bölümünden haritayı kapatırsanız Kadra <strong>sıfır ağ trafiğiyle</strong>
+     çalışır. Bunu haritayı kapatıp telefonunuzu uçak moduna alarak kendiniz
+     doğrulayabilirsiniz: gösterge çalışmaya devam eder.</p>
+
+  <h2 id="google">Google Navigation SDK</h2>
+  <p>Harita, hedef arama ve adım adım navigasyon Google'ın Navigation SDK'sı ile sağlanır.
+     Harita etkinken ilk hedef seçiminde Google'ın kendi şartlar ve koşullar penceresi bir
+     kez gösterilir; kabul edilince yönlendirme başlar.</p>
+  <p>Bu SDK, Google'ın kendi hizmeti olarak çalışır ve kendi adına veri toplar. Google'ın
+     bu veriyi nasıl işlediği kendi gizlilik politikasına tabidir:
+     <a href="https://policies.google.com/privacy">policies.google.com/privacy</a>.
+     Kadra bu veriye erişmez ve bir kopyasını tutmaz.</p>
 
   <h2>Analitik, reklam ve izleme</h2>
-  <p>Kadra analitik aracı, reklam ağı veya üçüncü taraf izleme SDK'sı içermez.
-     Reklam kimliğinizi okumaz. Sizi hiçbir uygulama veya site üzerinden takip etmez.</p>
+  <p>Kadra'nın <strong>kendi</strong> analitik aracı, reklam ağı veya izleme SDK'sı yoktur.
+     Reklam kimliğinizi okumaz, sizi uygulamalar veya siteler arasında takip etmez ve
+     App Store'daki "İzleme" beyanı bu yüzden boştur.</p>
+  <p>Uygulamadaki tek üçüncü taraf bileşen yukarıda anlatılan Google Navigation SDK'sıdır
+     ve yalnızca harita açıkken devreye girer.</p>
 
   <h2>Telefonunuzda saklananlar</h2>
   <ul>
-    <li><strong>Ayarlarınız</strong> (yenileme modu, kadran konumu, harita ve yön kilidi
-        tercihleri) telefonunuzun kendi uygulama alanında tutulur.</li>
+    <li><strong>Ayarlarınız</strong> (yenileme modu, kadran konumu ve stili, harita ve yön
+        kilidi tercihleri, motor sesi ve ses profili, basınç birimi) telefonunuzun kendi
+        uygulama alanında tutulur.</li>
     <li><strong>Araç eşleştirme anahtarı</strong> iOS Anahtar Zinciri'nde şifreli olarak
         saklanır. Bu anahtar aracınızla konuşmak için gereklidir ve telefondan çıkmaz.</li>
   </ul>
@@ -91,6 +123,7 @@
       <a href="./">Ana sayfa</a>
       <a href="./gizlilik.html">Gizlilik Politikası</a>
       <a href="./kosullar.html">Kullanım Koşulları</a>
+      <a href="./privacy.html">English</a>
     </nav>
     <p>© 2026 Tunca Bildik</p>
   </footer>
