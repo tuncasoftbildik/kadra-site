@@ -58,21 +58,20 @@
   p { margin: 0; }
   .metin { max-width: 36em; color: var(--soluk); }
 
-  /* Açılış: harita üstünde canlı kadran */
-  .acilis {
-    position: relative;
-    overflow: hidden;
-    background: var(--kara);
-    min-height: min(100vh, 860px);
-    display: flex;
-    flex-direction: column;
-  }
-  .harita { position: absolute; inset: 0; width: 100%; height: 100%; }
+  /* Açılış: kaydırdıkça bir sürüş oynar. Sahne ekrana sabitlenir,
+     harita aracı izler, kadran ve kartlar kaydırma konumundan hesaplanır. */
+  .surus { position: relative; height: 520vh; background: var(--kara); }
+  .pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+  .harita { position: absolute; left: 0; top: 0; width: 2200px; height: 3400px; will-change: transform; }
+  .ok { position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px; will-change: transform; filter: drop-shadow(0 4px 8px rgba(27,37,51,.3)); }
+
   .ust {
-    position: relative;
+    position: absolute; inset: 0 0 auto 0; z-index: 3;
     display: flex; align-items: center; justify-content: space-between;
-    padding-block: 1.4rem;
+    padding: 1.2rem max(1.5rem, calc((100% - 1160px) / 2));
+    transition: background-color .3s, box-shadow .3s;
   }
+  .ust.dolu { background: rgba(250, 251, 252, .82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 1px 0 var(--cizgi); }
   .marka { display: flex; align-items: center; gap: .6rem; text-decoration: none; font-weight: 700; font-variation-settings: var(--genis); font-size: 1.15rem; }
   .marka img { width: 34px; height: 34px; border-radius: 9px; }
   .ust nav { display: flex; gap: 1.5rem; font-size: .95rem; }
@@ -80,17 +79,18 @@
   .ust nav a:hover { text-decoration: underline; text-underline-offset: 4px; }
 
   .sahne {
-    position: relative;
-    flex: 1;
-    display: grid;
-    grid-template-columns: 1.05fr 1fr;
-    align-items: center;
-    gap: 2rem;
-    padding-block: 2rem 5rem;
+    position: absolute; inset: 0; z-index: 2;
+    width: min(1160px, 100% - 3rem); margin-inline: auto;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center; gap: 2rem;
+    padding-top: 4.5rem;
+    pointer-events: none;
   }
-  .sahne h1 { max-width: 9.5em; }
-  .sahne .metin { margin-top: 1.4rem; color: #3D4A5A; font-size: 1.15rem; }
-  .eylem { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; margin-top: 2.2rem; }
+  .sahne a, .sahne .kart { pointer-events: auto; }
+  .sahne h1 { font-size: clamp(2.4rem, 5.4vw, 4.4rem); max-width: 9.5em; }
+  .giris { transition: opacity .4s, transform .4s; }
+  .giris .metin { margin-top: 1.2rem; color: #3D4A5A; font-size: 1.12rem; }
+  .eylem { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; margin-top: 2rem; }
   .magaza {
     display: inline-flex; align-items: center; gap: .65rem;
     padding: .8rem 1.25rem; border-radius: 14px;
@@ -100,15 +100,51 @@
   .magaza small { display: block; font-weight: 400; font-size: .78rem; opacity: .75; line-height: 1.1; }
   .magaza span { line-height: 1.15; }
   .bag { font-weight: 600; text-underline-offset: 5px; }
+  .ipucu { margin-top: 2.6rem; font-size: .9rem; color: var(--soluk); }
 
-  .kadran-kutu { position: relative; justify-self: center; width: min(470px, 100%); }
-  .kadran {
-    width: 100%; height: auto; display: block;
-    filter: drop-shadow(0 30px 50px rgba(27, 37, 51, .22));
+  .sol { position: relative; align-self: stretch; display: grid; align-content: center; }
+  .sahne.akiyor .giris { opacity: 0; transform: translateY(-16px); pointer-events: none; }
+  .kartlar { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); }
+  .kart {
+    position: absolute; left: 0; top: 0; transform: translateY(-50%) translateY(18px);
+    width: min(400px, 100%);
+    padding: 1.5rem 1.6rem 1.3rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, .78);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 18px 50px rgba(27, 37, 51, .14), inset 0 0 0 1px rgba(255,255,255,.7);
+    opacity: 0; visibility: hidden;
+    transition: opacity .35s, transform .35s, visibility 0s .35s;
   }
-  .kadran .rakam { font-family: "Archivo", sans-serif; font-variation-settings: "wdth" 100; font-weight: 200; }
+  .kart.etkin { opacity: 1; visibility: visible; transform: translateY(-50%); transition: opacity .35s, transform .35s; }
+  .kart-bas { display: flex; align-items: center; justify-content: space-between; color: var(--soluk); font-size: .92rem; }
+  .kart-bas strong { color: var(--c); font-size: 1.05rem; font-variation-settings: var(--genis); }
+  .kart-isaret { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 5px color-mix(in srgb, var(--c) 18%, transparent); }
+  .kart h3 { font-size: 1.55rem; margin-top: .7rem; }
+  .kart p { color: var(--soluk); margin-top: .5rem; }
+  .cubuklar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 1.2rem; }
+  .cubuklar i { height: 4px; border-radius: 2px; background: #DDE3EA; overflow: hidden; }
+  .cubuklar i span { display: block; height: 100%; background: var(--c); transform-origin: left; transform: scaleX(0); }
+
+  .kadran-kutu { position: relative; justify-self: center; width: min(440px, 100%); }
+  .kadran { width: 100%; height: auto; display: block; filter: drop-shadow(0 30px 50px rgba(27, 37, 51, .22)); }
+  .kadran .rakam { font-family: "Archivo", sans-serif; font-weight: 200; }
   .kadran .birim { font-family: "Archivo", sans-serif; font-weight: 500; }
-  .not { position: absolute; left: 0; right: 0; bottom: -2.2rem; text-align: center; font-size: .85rem; color: var(--soluk); }
+  .varis {
+    position: absolute; right: -.5rem; bottom: -1.2rem;
+    display: flex; align-items: center; gap: .8rem;
+    padding: .8rem 1.1rem; border-radius: 18px;
+    background: rgba(255,255,255,.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 12px 30px rgba(27,37,51,.16);
+    opacity: 0; transform: translateY(10px); transition: opacity .35s, transform .35s;
+  }
+  .varis.gorunur { opacity: 1; transform: none; }
+  .varis svg { width: 26px; height: 26px; flex: none; }
+  .varis strong { display: block; font-variation-settings: var(--genis); }
+  .varis span { color: var(--soluk); font-size: .92rem; }
+  .not { position: absolute; left: 0; right: 0; bottom: -3.4rem; text-align: center; font-size: .82rem; color: var(--soluk); }
+  .ilerleme { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; z-index: 3; background: rgba(27,37,51,.08); }
+  .ilerleme span { display: block; height: 100%; background: var(--ibre); transform-origin: left; transform: scaleX(0); }
 
   /* Bölümler */
   section { padding-block: clamp(4.5rem, 9vw, 7.5rem); }
@@ -190,9 +226,18 @@
   footer p { max-width: 60em; }
 
   @media (max-width: 860px) {
-    .sahne { grid-template-columns: 1fr; padding-block: 1rem 5rem; gap: 3rem; }
-    .kadran-kutu { width: min(360px, 88%); }
     .ust nav a:not(:last-child) { display: none; }
+    .sahne { grid-template-columns: 1fr; grid-template-rows: auto 1fr; align-items: start; padding-top: 5rem; gap: 1rem; }
+    .sol { min-height: 15rem; align-content: start; }
+    .kartlar { top: 0; transform: none; }
+    .kart { transform: translateY(18px); }
+    .kart.etkin { transform: none; }
+    .giris .metin { font-size: 1rem; }
+    .ipucu { display: none; }
+    .kadran-kutu { width: min(250px, 62%); align-self: start; }
+    .varis { right: auto; left: 50%; bottom: -1.6rem; transform: translate(-50%, 10px); white-space: nowrap; }
+    .varis.gorunur { transform: translate(-50%, 0); }
+    .not { display: none; }
     .adimlar, .sss, .gizlilik .iki { grid-template-columns: 1fr; }
     .adimlar { gap: 3rem; }
     .ekranlar { grid-template-columns: 1fr 1fr; }
@@ -209,78 +254,124 @@
 </head>
 <body>
 
-<header class="acilis">
-  <!-- Harita zemini: uygulamanın Apple Haritalar açık temasıyla aynı renkler -->
-  <svg class="harita" viewBox="0 0 1440 860" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <rect width="1440" height="860" fill="#EEF0E8"/>
-    <path d="M1440 0 H1010 C985 90 1040 150 1010 230 C980 310 900 330 905 420 C910 520 1010 560 1000 660 C992 740 930 800 950 860 H1440 Z" fill="#9FD4F3"/>
-    <path d="M1010 230 C1060 240 1110 225 1150 240 L1146 252 C1105 240 1062 254 1008 244 Z" fill="#EEF0E8"/>
-    <path d="M905 420 C960 430 1020 415 1070 432 L1066 446 C1018 430 960 446 903 434 Z" fill="#EEF0E8"/>
-    <path d="M640 610 C700 580 760 620 800 600 C840 585 860 640 840 690 C810 750 730 745 680 720 C640 700 610 650 640 610 Z" fill="#CFE9C5"/>
-    <g fill="none" stroke="#FFFFFF" stroke-linecap="round" opacity=".55">
-      <path d="M-20 150 C160 160 300 120 470 150" stroke-width="5"/>
-      <path d="M90 -20 C110 120 80 220 120 330" stroke-width="5"/>
-    </g>
-    <g fill="none" stroke="#FFFFFF" stroke-linecap="round">
-      <path d="M760 -20 C770 140 820 250 812 400 C806 520 840 660 828 880" stroke-width="14"/>
-      <path d="M770 300 C830 298 880 300 905 300" stroke-width="9"/>
-      <path d="M780 540 C830 520 870 490 905 470" stroke-width="9"/>
-      <path d="M690 160 L860 180 M650 760 L960 730 M900 600 L1000 640 M720 420 L812 430" stroke-width="5"/>
-    </g>
-    <path d="M1040 430 C1010 520 930 560 900 640 C875 710 900 790 880 880" fill="none" stroke="#34C266" stroke-width="10" stroke-linecap="round"/>
-  </svg>
+<header class="surus" id="surus">
+  <div class="pin">
+    <svg class="harita" id="harita" viewBox="0 0 2200 3400" aria-hidden="true">
+      <rect width="2200" height="3400" fill="#EEF0E8"/>
+      <path d="M1560 0 C1520 300 1640 520 1600 820 C1560 1100 1420 1240 1440 1560 C1460 1880 1620 2040 1580 2400 C1550 2700 1460 2900 1500 3400 H2200 V0 Z" fill="#9FD4F3"/>
+      <path d="M1600 820 C1680 830 1760 815 1840 830 L1836 846 C1760 832 1682 846 1598 836 Z M1440 1560 C1530 1572 1610 1556 1700 1570 L1696 1586 C1612 1572 1530 1588 1438 1576 Z" fill="#EEF0E8"/>
+      <g fill="#CFE9C5">
+        <path d="M380 520 C480 470 620 540 660 620 C700 720 560 780 450 750 C350 720 300 600 380 520 Z"/>
+        <path d="M1120 1900 C1210 1860 1300 1920 1310 2000 C1320 2090 1210 2120 1140 2090 C1070 2060 1060 1940 1120 1900 Z"/>
+        <path d="M520 2700 C640 2650 780 2720 790 2820 C800 2920 650 2960 560 2920 C470 2880 440 2750 520 2700 Z"/>
+      </g>
+      <g fill="none" stroke="#FFFFFF" stroke-linecap="round">
+        <path d="M0 400 C400 380 800 430 1560 380" stroke-width="12"/>
+        <path d="M0 1100 C500 1060 1000 1140 1500 1100" stroke-width="10"/>
+        <path d="M0 1800 C420 1830 900 1760 1450 1800" stroke-width="12"/>
+        <path d="M0 2500 C500 2470 1000 2540 1560 2500" stroke-width="10"/>
+        <path d="M300 0 C330 900 260 1800 320 3400" stroke-width="9"/>
+        <path d="M1250 0 C1240 900 1300 1800 1260 3400" stroke-width="7"/>
+        <path d="M0 760 L1580 700 M0 1450 L1450 1420 M0 2150 L1560 2200 M0 2900 L1500 2860 M600 0 L640 3400 M1050 0 L1000 3400" stroke-width="5" opacity=".9"/>
+      </g>
+      <path id="rota-iz" d="M900 80 C900 420 760 600 820 900 C880 1200 1080 1300 1040 1640 C1000 1960 820 2100 860 2440 C900 2760 1080 2900 1040 3300" fill="none" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round"/>
+      <path id="rota" d="M900 80 C900 420 760 600 820 900 C880 1200 1080 1300 1040 1640 C1000 1960 820 2100 860 2440 C900 2760 1080 2900 1040 3300" fill="none" stroke="#34C266" stroke-width="12" stroke-linecap="round"/>
+      <g id="hedef" transform="translate(900 80)">
+        <circle r="20" fill="#FFFFFF"/><circle r="13" fill="#E0524D"/>
+      </g>
+    </svg>
+    <svg class="ok" id="ok" viewBox="0 0 34 34" aria-hidden="true">
+      <circle cx="17" cy="17" r="16" fill="#FFFFFF"/>
+      <path d="M17 6 L25 26 L17 21.5 L9 26 Z" fill="#E8A33D"/>
+    </svg>
 
-  <div class="sar ust">
-    <a class="marka" href="./"><img src="./img/ikon.png" alt="" width="34" height="34">Kadra</a>
-    <nav aria-label="Sayfa içi">
-      <a href="#kurulum">Kurulum</a>
-      <a href="#ekranlar">Ekranlar</a>
-      <a href="#fiyat">Ücretsiz ve Tam sürüm</a>
-      <a href="#destek">Destek</a>
-    </nav>
-  </div>
+    <div class="ust" id="ust">
+      <a class="marka" href="./"><img src="./img/ikon.png" alt="" width="34" height="34">Kadra</a>
+      <nav aria-label="Sayfa içi">
+        <a href="#kurulum">Kurulum</a>
+        <a href="#ekranlar">Ekranlar</a>
+        <a href="#fiyat">Ücretsiz ve Tam sürüm</a>
+        <a href="#destek">Destek</a>
+      </nav>
+    </div>
 
-  <div class="sar sahne">
-    <div>
-      <h1>Tesla'nın göstergesi, telefonunda.</h1>
-      <p class="metin">Kadra aracına Bluetooth ile doğrudan bağlanır. Hızı, gücü, bataryayı ve menzili canlı bir kadranda gösterir; arada sunucu da hesap da yok.</p>
-      <div class="eylem">
-        <span class="magaza">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.87-.76-1.47.02-2.83.86-3.59 2.17-1.54 2.66-.39 6.6 1.1 8.76.73 1.06 1.6 2.24 2.73 2.2 1.1-.05 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.41 1.2-2.47-.03-.01-2.3-.88-2.32-3.5zM14.19 6.13c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.64-1.05 1.68-.92 2.67.97.08 1.96-.49 2.56-1.22z"/></svg>
-          <span><small>Çok yakında</small>App Store'da</span>
-        </span>
-        <a class="bag" href="#kurulum">Nasıl bağlanır</a>
+    <div class="sahne" id="sahne">
+      <div class="sol">
+        <div class="giris">
+          <h1>Tesla'nın göstergesi, telefonunda.</h1>
+          <p class="metin">Kadra aracına Bluetooth ile doğrudan bağlanır. Hızı, gücü, bataryayı ve menzili canlı bir kadranda gösterir; arada sunucu da hesap da yok.</p>
+          <div class="eylem">
+            <span class="magaza">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.87-.76-1.47.02-2.83.86-3.59 2.17-1.54 2.66-.39 6.6 1.1 8.76.73 1.06 1.6 2.24 2.73 2.2 1.1-.05 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.41 1.2-2.47-.03-.01-2.3-.88-2.32-3.5zM14.19 6.13c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.64-1.05 1.68-.92 2.67.97.08 1.96-.49 2.56-1.22z"/></svg>
+              <span><small>Çok yakında</small>App Store'da</span>
+            </span>
+            <a class="bag" href="#kurulum">Nasıl bağlanır</a>
+          </div>
+          <p class="ipucu">Aşağı kaydır, bir sürüşü birlikte izleyelim.</p>
+        </div>
+
+        <div class="kartlar" aria-live="polite">
+          <article class="kart" style="--c:#2AA6F0">
+            <div class="kart-bas"><span><strong>01</strong> / 04</span><span class="kart-isaret"></span></div>
+            <h3>Kalkış</h3>
+            <p>Vitesi D'ye aldığın an kadran canlanır. Hız, güç ve vites araçtan saniyede birkaç kez okunur.</p>
+            <div class="cubuklar"><i><span></span></i><i><span></span></i><i><span></span></i><i><span></span></i></div>
+          </article>
+          <article class="kart" style="--c:#E0524D">
+            <div class="kart-bas"><span><strong>02</strong> / 04</span><span class="kart-isaret"></span></div>
+            <h3>Geri kazanım</h3>
+            <p>Yavaşlarken kırmızı yay, aracın bataryaya geri verdiği gücü gösterir.</p>
+            <div class="cubuklar"><i><span></span></i><i><span></span></i><i><span></span></i><i><span></span></i></div>
+          </article>
+          <article class="kart" style="--c:#34C266">
+            <div class="kart-bas"><span><strong>03</strong> / 04</span><span class="kart-isaret"></span></div>
+            <h3>Yol boyunca</h3>
+            <p>Batarya, menzil ve lastik basıncı göz ucunda. Bir lastik düşerse uyarı kendiliğinden çıkar.</p>
+            <div class="cubuklar"><i><span></span></i><i><span></span></i><i><span></span></i><i><span></span></i></div>
+          </article>
+          <article class="kart" style="--c:#E8A33D">
+            <div class="kart-bas"><span><strong>04</strong> / 04</span><span class="kart-isaret"></span></div>
+            <h3>Varış</h3>
+            <p>Aracında bir hedef seçtiysen varış saati ve varışta kalacak batarya kadranın yanında durur.</p>
+            <div class="cubuklar"><i><span></span></i><i><span></span></i><i><span></span></i><i><span></span></i></div>
+          </article>
+        </div>
+      </div>
+
+      <div class="kadran-kutu">
+        <svg class="kadran" viewBox="0 0 400 400" role="img" aria-labelledby="kadran-adi">
+          <title id="kadran-adi">Kadra kokpit kadranı, örnek sürüş</title>
+          <defs>
+            <radialGradient id="cam" cx="50%" cy="38%" r="65%">
+              <stop offset="0" stop-color="#FFFFFF"/>
+              <stop offset="1" stop-color="#EEF2F6"/>
+            </radialGradient>
+          </defs>
+          <circle cx="200" cy="200" r="196" fill="#FFFFFF" fill-opacity=".55"/>
+          <circle cx="200" cy="200" r="178" fill="url(#cam)"/>
+          <path id="hiz-iz" d="" fill="none" stroke="#DDE3EA" stroke-width="9" stroke-linecap="round"/>
+          <path id="hiz" d="" fill="none" stroke="#2AA6F0" stroke-width="9" stroke-linecap="round"/>
+          <path id="rejen" d="" fill="none" stroke="#E0524D" stroke-width="6" stroke-linecap="round"/>
+          <g id="cizgiler" stroke="#1B2533" stroke-linecap="round"></g>
+          <g font-family="Archivo, sans-serif" font-size="17" font-weight="600" text-anchor="middle" fill="#A5AFBB">
+            <circle id="vites" cx="148" cy="99" r="15" fill="#2AA6F0"/>
+            <text id="v-P" x="148" y="105">P</text><text id="v-R" x="182" y="105">R</text><text id="v-N" x="216" y="105">N</text><text id="v-D" x="250" y="105">D</text>
+          </g>
+          <text id="rakam" class="rakam" x="200" y="240" text-anchor="middle" font-size="104" fill="#1B2533">0</text>
+          <text class="birim" x="200" y="276" text-anchor="middle" font-size="17" fill="#5E6B7B">km/sa</text>
+          <text id="yuzde" class="birim" x="200" y="306" text-anchor="middle" font-size="16" font-weight="700" fill="#34C266">%72</text>
+          <path id="pil-iz" d="" fill="none" stroke="#DDE3EA" stroke-width="7" stroke-linecap="round"/>
+          <path id="pil" d="" fill="none" stroke="#34C266" stroke-width="7" stroke-linecap="round"/>
+        </svg>
+        <div class="varis" id="varis">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 3.5L16 11H7v10z" fill="#34C266"/></svg>
+          <div><strong>Ev</strong><span id="varis-metin">Varış 18:47, varışta %69</span></div>
+        </div>
+        <p class="not">Örnek sürüş verisi</p>
       </div>
     </div>
 
-    <div class="kadran-kutu">
-      <svg class="kadran" viewBox="0 0 400 400" role="img" aria-labelledby="kadran-adi">
-        <title id="kadran-adi">Kadra kokpit kadranı, örnek sürüş</title>
-        <defs>
-          <radialGradient id="cam" cx="50%" cy="38%" r="65%">
-            <stop offset="0" stop-color="#FFFFFF"/>
-            <stop offset="1" stop-color="#EEF2F6"/>
-          </radialGradient>
-        </defs>
-        <circle cx="200" cy="200" r="196" fill="#FFFFFF" fill-opacity=".55"/>
-        <circle cx="200" cy="200" r="178" fill="url(#cam)"/>
-        <path id="hiz-iz" d="" fill="none" stroke="#DDE3EA" stroke-width="9" stroke-linecap="round"/>
-        <path id="hiz" d="" fill="none" stroke="#2AA6F0" stroke-width="9" stroke-linecap="round"/>
-        <path id="rejen" d="" fill="none" stroke="#E0524D" stroke-width="5" stroke-linecap="round"/>
-        <g id="cizgiler" stroke="#1B2533" stroke-linecap="round"></g>
-        <g font-family="Archivo, sans-serif" font-size="17" font-weight="600" text-anchor="middle" fill="#A5AFBB">
-          <text x="148" y="111">P</text><text x="182" y="105">R</text><text x="216" y="105">N</text>
-          <circle cx="250" cy="99" r="15" fill="#2AA6F0"/>
-          <text x="250" y="105" fill="#FFFFFF">D</text>
-        </g>
-        <text id="rakam" class="rakam" x="200" y="240" text-anchor="middle" font-size="104" fill="#1B2533">72</text>
-        <text class="birim" x="200" y="276" text-anchor="middle" font-size="17" fill="#5E6B7B">km/sa</text>
-        <text class="birim" x="200" y="306" text-anchor="middle" font-size="16" font-weight="700" fill="#34C266">%72</text>
-        <path id="pil-iz" d="" fill="none" stroke="#DDE3EA" stroke-width="7" stroke-linecap="round"/>
-        <path id="pil" d="" fill="none" stroke="#34C266" stroke-width="7" stroke-linecap="round"/>
-      </svg>
-      <p class="not">Örnek sürüş verisi</p>
-    </div>
+    <div class="ilerleme"><span id="ilerleme"></span></div>
   </div>
 </header>
 
@@ -417,6 +508,7 @@
 
 <script>
 (() => {
+  const $ = id => document.getElementById(id);
   const C = 200, R = 160;
   const nokta = (aci, r = R) => {
     const a = (aci - 90) * Math.PI / 180;
@@ -429,55 +521,96 @@
     return `M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${son - bas > 180 ? 1 : 0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`;
   };
   const BAS = 225, SUPURME = 270, AZAMI = 160;
-  const $ = id => document.getElementById(id);
   $("hiz-iz").setAttribute("d", yay(BAS, BAS + SUPURME));
   $("pil-iz").setAttribute("d", yay(150, 210, 132));
-  $("pil").setAttribute("d", yay(150, 150 + 60 * 0.72, 132));
-
   const g = $("cizgiler");
   for (let i = 0; i <= 16; i++) {
-    const aci = BAS + SUPURME * i / 16;
-    const uzun = i % 4 === 0;
+    const aci = BAS + SUPURME * i / 16, uzun = i % 4 === 0;
     const [x1, y1] = nokta(aci, 146), [x2, y2] = nokta(aci, uzun ? 128 : 136);
     const l = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    l.setAttribute("x1", x1); l.setAttribute("y1", y1); l.setAttribute("x2", x2); l.setAttribute("y2", y2);
-    l.setAttribute("stroke-width", uzun ? 3 : 2);
-    l.setAttribute("opacity", uzun ? .75 : .35);
+    Object.entries({ x1, y1, x2, y2, "stroke-width": uzun ? 3 : 2, opacity: uzun ? .75 : .35 })
+      .forEach(([k, v]) => l.setAttribute(k, v));
     g.appendChild(l);
   }
 
-  const ciz = (hiz, rejen) => {
+  // Sürüş senaryosu, kaydırma ilerlemesi p (0–1) üzerinden.
+  const ara = (anahtar, p) => {
+    for (let i = 1; i < anahtar.length; i++) {
+      const [p0, v0] = anahtar[i - 1], [p1, v1] = anahtar[i];
+      if (p <= p1) { const k = (p - p0) / (p1 - p0), e = k * k * (3 - 2 * k); return v0 + (v1 - v0) * e; }
+    }
+    return anahtar[anahtar.length - 1][1];
+  };
+  const HIZ = [[0, 0], [.06, 0], [.22, 58], [.30, 60], [.46, 22], [.54, 26], [.70, 108], [.80, 104], [.94, 0], [1, 0]];
+  const KAZANIM = [[0, 0], [.30, 0], [.38, .9], [.46, 0], [.82, 0], [.88, .55], [.94, 0], [1, 0]];
+  const KARTLAR = [[.04, .30], [.30, .54], [.54, .80], [.80, 1.01]];
+  const kartlar = [...document.querySelectorAll(".kart")];
+  const VITES_X = { P: 148, R: 182, N: 216, D: 250 };
+
+  const rota = $("rota"), uzunluk = rota.getTotalLength();
+  const harita = $("harita"), ok = $("ok");
+
+  let hedefP = 0, gosterilenP = -1, sonVites = "";
+  const ciz = p => {
+    const hiz = ara(HIZ, p);
     $("hiz").setAttribute("d", yay(BAS, BAS + SUPURME * Math.min(hiz, AZAMI) / AZAMI));
-    $("rejen").setAttribute("d", rejen > 0.02 ? yay(70, 70 + 50 * rejen, 172) : "");
     $("rakam").textContent = Math.round(hiz);
+    const k = ara(KAZANIM, p);
+    $("rejen").setAttribute("d", k > .02 ? yay(70, 70 + 55 * k, 172) : "");
+    const pil = 72 - 3 * Math.min(1, Math.max(0, (p - .06) / .88));
+    $("pil").setAttribute("d", yay(150, 150 + 60 * pil / 100, 132));
+    $("yuzde").textContent = "%" + Math.round(pil);
+
+    const vites = p < .05 || p > .95 ? "P" : "D";
+    if (vites !== sonVites) {
+      $("vites").setAttribute("cx", VITES_X[vites]);
+      for (const v in VITES_X) $("v-" + v).setAttribute("fill", v === vites ? "#FFFFFF" : "#A5AFBB");
+      sonVites = vites;
+    }
+
+    // Harita aracı izler: ok ekranda sabit bir noktada, harita altından akar.
+    // Rota yukarı doğru sürülür: araç yolun sonundan (altta) başlar, kalan yol hep önünde.
+    const yol = (1 - Math.min(1, Math.max(0, (p - .04) / .92))) * uzunluk;
+    const a = rota.getPointAtLength(yol), b = rota.getPointAtLength(Math.max(0, yol - 4));
+    const yon = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI + 90;
+    const genis = innerWidth > 860;
+    const vx = innerWidth * (genis ? .5 : .5), vy = innerHeight * (genis ? .74 : .80);
+    harita.style.transform = `translate(${vx - a.x}px, ${vy - a.y}px)`;
+    ok.style.transform = `translate(${vx}px, ${vy}px) rotate(${yon}deg)`;
+    rota.setAttribute("stroke-dasharray", `${yol} ${uzunluk}`);
+
+    let etkin = -1, yerel = 0;
+    KARTLAR.forEach(([s, e], i) => { if (p >= s && p < e) { etkin = i; yerel = (p - s) / (e - s); } });
+    kartlar.forEach((kart, i) => {
+      kart.classList.toggle("etkin", i === etkin);
+      kart.querySelectorAll(".cubuklar span").forEach((c, j) => {
+        c.style.transform = `scaleX(${j < etkin ? 1 : j === etkin ? yerel : 0})`;
+      });
+    });
+    $("sahne").classList.toggle("akiyor", p > .03);
+    $("varis").classList.toggle("gorunur", p > .80);
+    $("ilerleme").style.transform = `scaleX(${p})`;
   };
 
-  // Örnek sürüş: şehir içi kalkış, yavaşlama (geri kazanım), otoyol.
-  const plan = [[0, 0], [5, 54], [8, 58], [11, 22], [13, 18], [19, 96], [24, 104], [27, 88], [30, 0]];
-  const hizAt = t => {
-    for (let i = 1; i < plan.length; i++) {
-      const [t0, v0] = plan[i - 1], [t1, v1] = plan[i];
-      if (t <= t1) {
-        const k = (t - t0) / (t1 - t0), e = k * k * (3 - 2 * k);
-        return [v0 + (v1 - v0) * e, v1 < v0 ? Math.min(1, (v0 - v1) / 60) * Math.sin(Math.PI * k) : 0];
-      }
-    }
-    return [0, 0];
+  const surus = $("surus");
+  const olc = () => {
+    const toplam = surus.offsetHeight - innerHeight;
+    hedefP = Math.max(0, Math.min(1, scrollY / Math.max(1, toplam)));
+    $("ust").classList.toggle("dolu", scrollY > toplam - 4);
   };
-
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { ciz(72, 0); return; }
-  let bas = null, gorunur = true;
-  new IntersectionObserver(([e]) => { gorunur = e.isIntersecting; }).observe($("hiz-iz"));
-  const kare = zaman => {
-    if (bas === null) bas = zaman;
-    if (gorunur) {
-      const [h, r] = hizAt(((zaman - bas) / 1000) % 30);
-      ciz(h, r);
-    }
-    requestAnimationFrame(kare);
+  // Hafif yumuşatma: kaydırma tekeri sıçrasa da kadran akarak gelir.
+  const azalt = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const kare = () => {
+    const fark = hedefP - gosterilenP;
+    gosterilenP = azalt || Math.abs(fark) < .0005 ? hedefP : gosterilenP + fark * .18;
+    ciz(gosterilenP);
+    if (gosterilenP !== hedefP) requestAnimationFrame(kare); else calisiyor = false;
   };
-  ciz(0, 0);
-  requestAnimationFrame(kare);
+  let calisiyor = false;
+  const tetikle = () => { olc(); if (!calisiyor) { calisiyor = true; requestAnimationFrame(kare); } };
+  addEventListener("scroll", tetikle, { passive: true });
+  addEventListener("resize", () => { gosterilenP = -1; tetikle(); });
+  tetikle();
 })();
 </script>
 </body>
