@@ -198,6 +198,28 @@
   }
   .paket .pro li::before { background: var(--ibre); }
 
+  /* Erken erişim ön kaydı */
+  .onkayit { display: grid; grid-template-columns: 1fr 1.15fr; gap: 3.5rem; align-items: start; }
+  .onkayit form { display: grid; gap: 1.1rem; }
+  .alanlar { display: grid; grid-template-columns: 1fr auto 1fr; gap: .8rem; align-items: end; }
+  .alan label { display: block; font-weight: 600; font-size: .95rem; margin-bottom: .4rem; }
+  .alan input {
+    width: 100%; font: inherit; padding: .85rem 1rem; border-radius: 12px;
+    border: 1px solid var(--cizgi); background: #fff; color: var(--murekkep);
+  }
+  .alan input:focus { outline: 3px solid color-mix(in srgb, var(--ibre) 35%, transparent); border-color: var(--ibre); }
+  .ya-da { color: var(--soluk); font-size: .9rem; padding-bottom: .9rem; }
+  .riza { display: grid; grid-template-columns: auto 1fr; gap: .7rem; align-items: start; font-size: .95rem; color: var(--soluk); }
+  .riza input { width: 1.15rem; height: 1.15rem; margin-top: .2rem; accent-color: var(--ibre); }
+  .gonder {
+    justify-self: start; font: inherit; font-weight: 600; border: 0; cursor: pointer;
+    padding: .85rem 1.6rem; border-radius: 12px; background: var(--murekkep); color: #fff;
+  }
+  .gonder:disabled { opacity: .55; cursor: default; }
+  .durum { min-height: 1.5em; font-weight: 600; }
+  .durum.iyi { color: #1E7F43; } .durum.kotu { color: var(--rejen); }
+  .bal { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
   /* Gizlilik */
   .gizlilik { background: var(--murekkep); color: #fff; }
   section.gizlilik, .gizlilik + section { border-top: 0; }
@@ -238,7 +260,9 @@
     .varis { right: auto; left: 50%; bottom: -1.6rem; transform: translate(-50%, 10px); white-space: nowrap; }
     .varis.gorunur { transform: translate(-50%, 0); }
     .not { display: none; }
-    .adimlar, .sss, .gizlilik .iki { grid-template-columns: 1fr; }
+    .adimlar, .sss, .gizlilik .iki, .onkayit { grid-template-columns: 1fr; }
+    .alanlar { grid-template-columns: 1fr; }
+    .ya-da { padding: 0; }
     .adimlar { gap: 3rem; }
     .ekranlar { grid-template-columns: 1fr 1fr; }
     .ekranlar figure:nth-child(2) { margin-top: 0; }
@@ -291,6 +315,7 @@
         <a href="#kurulum">Kurulum</a>
         <a href="#ekranlar">Ekranlar</a>
         <a href="#fiyat">Ücretsiz ve Tam sürüm</a>
+        <a href="#erken-erisim">Erken erişim</a>
         <a href="#destek">Destek</a>
       </nav>
     </div>
@@ -305,7 +330,7 @@
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.87-.76-1.47.02-2.83.86-3.59 2.17-1.54 2.66-.39 6.6 1.1 8.76.73 1.06 1.6 2.24 2.73 2.2 1.1-.05 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.41 1.2-2.47-.03-.01-2.3-.88-2.32-3.5zM14.19 6.13c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.64-1.05 1.68-.92 2.67.97.08 1.96-.49 2.56-1.22z"/></svg>
               <span><small>Çok yakında</small>App Store'da</span>
             </span>
-            <a class="bag" href="#kurulum">Nasıl bağlanır</a>
+            <a class="bag" href="#erken-erisim">Erken erişime kaydol</a>
           </div>
           <p class="ipucu">Aşağı kaydır, bir sürüşü birlikte izleyelim.</p>
         </div>
@@ -454,9 +479,41 @@
     </div>
   </section>
 
+  <section id="erken-erisim">
+    <div class="sar onkayit">
+      <div class="baslik">
+        <h2>Yayından önce dene.</h2>
+        <p class="metin">Kadra App Store'a çıkmadan önce sınırlı sayıda Tesla sahibine erken erişim daveti gönderiyoruz. E-posta adresin ya da telefon numaran yeter; davet hazır olduğunda haber veririz.</p>
+      </div>
+      <form id="onkayit-formu" novalidate>
+        <div class="alanlar">
+          <div class="alan">
+            <label for="eposta">E-posta</label>
+            <input id="eposta" name="eposta" type="email" autocomplete="email" inputmode="email" placeholder="ornek@eposta.com">
+          </div>
+          <span class="ya-da">ya da</span>
+          <div class="alan">
+            <label for="telefon">Telefon</label>
+            <input id="telefon" name="telefon" type="tel" autocomplete="tel" inputmode="tel" placeholder="5xx xxx xx xx">
+          </div>
+        </div>
+        <div class="bal" aria-hidden="true">
+          <label for="web_sitesi">Web siten</label>
+          <input id="web_sitesi" name="web_sitesi" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <label class="riza">
+          <input id="riza" name="riza" type="checkbox">
+          <span><a href="./onkayit-aydinlatma.html">Aydınlatma metnini</a> okudum. E-posta adresimin ya da telefon numaramın yalnız erken erişim daveti ve Kadra'nın yayına çıktığı haberi için kullanılmasına açık rıza veriyorum.</span>
+        </label>
+        <button class="gonder" type="submit">Ön kayıt ol</button>
+        <p class="durum" id="onkayit-durum" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
   <section class="gizlilik" id="gizlilik">
     <div class="sar">
-      <h2>Verilerin telefonunda kalır, çünkü gidecekleri bir sunucu yok.</h2>
+      <h2>Aracının verisi telefonunda kalır, çünkü gideceği bir sunucu yok.</h2>
       <div class="iki">
         <p>Kadra'ya kayıt olmazsın, şifre girmezsin. Araçla telefon arasındaki her şey Bluetooth üzerinden geçer. Harita açıkken konumun yalnız harita ve yol tarifi için Apple'a ya da Google'a gider; haritayı kapatırsan uygulama hiç internete çıkmaz. Denemek kolay: telefonu uçak moduna al, Kadra çalışmaya devam eder.</p>
         <p>Kadra yalnızca okur. Kapı açamaz, aracı süremez, ayar değiştiremez; aracın paylaştığı bilgiyi gösterir. Uygulamayı kapattığında araca soru sormayı bırakır, uyuyan aracı sen istemedikçe uyandırmaz. Ayrıntılar <a href="./gizlilik.html">gizlilik politikasında</a>.</p>
@@ -611,6 +668,33 @@
   addEventListener("scroll", tetikle, { passive: true });
   addEventListener("resize", () => { gosterilenP = -1; tetikle(); });
   tetikle();
+})();
+</script>
+<script>
+// Erken erişim ön kaydı → api.kadraev.com (Cloudflare Worker). IP ya da çerez saklanmaz.
+(() => {
+  const form = document.getElementById("onkayit-formu");
+  if (!form) return;
+  const durum = document.getElementById("onkayit-durum");
+  const dugme = form.querySelector(".gonder");
+  const yaz = (metin, iyi) => { durum.textContent = metin; durum.className = "durum " + (iyi ? "iyi" : "kotu"); };
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const eposta = form.eposta.value.trim(), telefon = form.telefon.value.trim();
+    if (!eposta && !telefon) return yaz("E-posta ya da telefon numarası yaz.", false);
+    if (!form.riza.checked) return yaz("Devam etmek için aydınlatma metnini onaylaman gerekiyor.", false);
+    dugme.disabled = true; yaz("Gönderiliyor…", true);
+    try {
+      const r = await fetch("https://api.kadraev.com/onkayit", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eposta, telefon, riza: true, web_sitesi: form.web_sitesi.value }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok && j.ok) { form.reset(); yaz("Kaydın alındı. Davet hazır olduğunda haber vereceğiz.", true); }
+      else yaz(j.hata || "Kayıt alınamadı. Biraz sonra tekrar dene.", false);
+    } catch { yaz("Bağlantı kurulamadı. Biraz sonra tekrar dene.", false); }
+    finally { dugme.disabled = false; }
+  });
 })();
 </script>
 </body>
